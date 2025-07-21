@@ -7,10 +7,8 @@ on:
         required: true
         type: choice
         options:
-          - 'oneplus_ace5'
-          - 'oneplus12'
-          - 'oneplus_pad_pro'
-        default: 'oneplus_ace5'
+          - 'realmegtneo5se'
+        default: 'realmegtneo5se'
       enable_feature_y:
         description: "启用lz4+zstd优化"
         required: false
@@ -35,15 +33,11 @@ jobs:
         id: set_manifest
         run: |
           case "${{ github.event.inputs.REPO_MANIFEST }}" in
-            oneplus12)
-              echo "REPO_MANIFEST=oneplus12_v" >> $GITHUB_ENV
-              echo "DEVICES_NAME=oneplus12" >> $GITHUB_ENV
+            于realmegtneo5se
+              echo "REPO_MANIFEST=realmegtneo5se" >> $GITHUB_ENV
+              echo "DEVICES_NAME=realmegtneo5se" >> $GITHUB_ENV
               ;;
-            oneplus_pad_pro)
-              echo "REPO_MANIFEST=oneplus_pad_pro_v" >> $GITHUB_ENV
-              echo "DEVICES_NAME=oneplus_pad_pro" >> $GITHUB_ENV
-              ;;
-            *)
+                        *)
               echo "REPO_MANIFEST=${{ github.event.inputs.REPO_MANIFEST }}" >> $GITHUB_ENV
               echo "DEVICES_NAME=${{ github.event.inputs.REPO_MANIFEST }}" >> $GITHUB_ENV
               ;;
@@ -123,7 +117,7 @@ jobs:
       - name: 📥 Initialize repo and sync (初始化repo并同步内核源码)
         run: |
           mkdir kernel_workspace && cd kernel_workspace
-          repo init -u https://github.com/OnePlusOSS/kernel_manifest.git -b refs/heads/oneplus/sm8650 -m ${REPO_MANIFEST}.xml --depth=1
+          repo init -u https://github.com/realme-kernel-opensource/realme_gt_neo5se-AndroidV-kernel-source.git -b master -m ${REPO_MANIFEST}.xml --depth=1
           repo --trace sync -c -j$(nproc --all) --no-tags
           # 移除dirty脏块
           sed -i 's/ -dirty//g' kernel_platform/common/scripts/setlocalversion
@@ -152,12 +146,10 @@ jobs:
       - name: 🔧 Set up SUSFS (配置 SUSFS)
         run: |
           cd kernel_workspace
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-6.1
-          git clone https://github.com/Xiaomichael/kernel_patches.git
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10
           git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
           cd kernel_platform
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch ./common/
-          cp ../kernel_patches/next/syscall_hooks.patch ./common/
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch ./common/
           cp ../susfs4ksu/kernel_patches/fs/* ./common/fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux/
           if [ "${{ github.event.inputs.enable_feature_y }}" = "true" ]; then
@@ -166,7 +158,7 @@ jobs:
             cp ../kernel_patches/zram/002-zstd.patch ./common/
           fi
           cd ./common
-          patch -p1 < 50_add_susfs_in_gki-android14-6.1.patch || true
+          patch -p1 < 50_add_susfs_in_gki-android10-5.10.patch || true
           cp ../../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch
           patch -p1 -F 3 < syscall_hooks.patch
