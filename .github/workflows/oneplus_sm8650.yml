@@ -33,7 +33,7 @@ jobs:
         id: set_manifest
         run: |
           case "${{ github.event.inputs.REPO_MANIFEST }}" in
-            于realmegtneo5se
+            于realmegtneo5se)
               echo "REPO_MANIFEST=realmegtneo5se" >> $GITHUB_ENV
               echo "DEVICES_NAME=realmegtneo5se" >> $GITHUB_ENV
               ;;
